@@ -1,0 +1,50 @@
+%通过聚类中心寻找消失点
+% pbw——
+function [vanishingpoint]=findvanpoint(pylist)
+%pbw=imread('5p.bmp');
+% vanishingpoint——消失点坐标；
+% crossline——聚类消失点的相交标号；
+%pbw=imread('p7.bmp');
+num1 = length(pylist);           
+for i=1:num1
+    aa = pylist{i};
+    if length(aa)>9
+      x = aa(:,1);
+      y = aa(:,2);
+      p1 = polyfit(x,y,1);  %一次拟合 
+      Ylist{i} = p1;
+end
+crossnum = 1;
+for i=1:num1-1
+    for j=i+1:num1
+        p1 = Ylist{i};
+        p2 = Ylist{j};
+        xcord = (p1(1,2)-p2(1,2))/(p2(1,1)-p1(1,1));
+        crosspoint(crossnum,1) = xcord;
+        crosspoint(crossnum,2) = p1(1,1)*xcord+p1(1,2);
+        crossnum = crossnum+1;
+    end
+end
+crossnum = crossnum-1;
+%寻找聚类中心
+if crossnum==1
+    vanishingpoint = crosspoint;
+ else
+    %plot(crosspoint(:,1),crosspoint(:,2),'*','color','b');
+    [C,U,obj_fcn] = fcm(crosspoint, 2);  %方法一
+    maxU = max(U);
+    index1 = find(U(1,:) == maxU);
+    index2 = find(U(2, :) == maxU);
+    [IDX,C1] = kmeans(X,3);   %方法二
+    plot(C(:,1),C(:,2),'rs','color','r');
+    hold on 
+    plot(C1(:,1),C1(:,2),'o','color','r');
+    if length(index1)>length(index2)
+        Cs = 1;
+    else
+        Cs = 2;
+    end
+    vanishingpoint = C(Cs,:);
+end
+
+

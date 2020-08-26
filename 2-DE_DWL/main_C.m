@@ -1,0 +1,145 @@
+
+%主函数%%%
+close all
+clear all
+for i=3:21;
+str=sprintf('%.0f.jpg',i);
+I = imread(str);
+
+[M,N] = size(I(:,:,1));
+Msize = 5;
+figure;
+imshow(I);
+%
+
+gr = rgb2gray(I);
+Gr = double(gr);       % uint8转换为double类型
+
+bw = edge(Gr,'canny');%canny算子边沿检测
+bw = bwmorph(bw,'clean',1);
+bw = bw(Msize:M-Msize,Msize:N-Msize);
+
+% % % %图像分割处理% % % % % % % % % % % % % % % % %
+%[Bw,nBw,Blist] = F_Segmentation(I);  %图像分割函数
+%save strt Bw nBw Blist
+load 31.mat
+%imshow(nBw);
+%figure;
+str=sprintf('%.0f_segbw.jpg',i);
+imwrite(Bw,str);
+
+%%%%统计区域自身特征
+[sf,llist,slist,p1list,p2list,vlist,tlist,vim,tim,pim]=F_SelfFeature(nBw,Gr,Blist);
+strt=sprintf('%.0f2.mat',i);
+save strt sf llist slist p1list p2list vlist tlist vim tim pim
+%load 112.mat
+[rbx,rby,vbx,vby,nroad,Rpim,Rtlist]=get_zbound(vim,tim,nBw,tlist);
+
+%% % % %消失点检测处理% % % % % % % % % % % % % % % %
+%拟合找消失点
+[vanishingpoint,vanimg,vanlist]=findvanpoint(tim,Rtlist,tlist);
+vanpoint = fix(vanishingpoint);
+figure
+imshow(bw);
+hold on 
+plot(vanpoint(1,2),vanpoint(1,1),'*','color','g');
+
+
+%% % % %区域颜色归一化处理% % % % % % % % % % % % % %
+nI = F_Regioncolor(I,Bw); %图像颜色归一化函数
+figure;
+imshow(nI);
+figure;
+str=sprintf('%.0f_seg.jpg',i);
+imwrite(nI,str);
+end
+%% % % %边缘图像编码处理% % % % % % % % % % % % % %
+[edgelist,edgeim,codeimg,dirlist,labelim] = linecoding(Bw);
+imshow(codeimg);
+figure;
+
+
+%% % % %平行线检测处理% % % % % % % % % % % % % %
+[dislist,Pim] = F_ParaLineDetection(bw);
+imshow(Pim);
+figure;
+imwrite(Pim,'4_parall.bmp');
+%% % % %垂直线检测% % % % % % % % % % % % % %
+[Vim,Verlist] = F_VerLineDetection(codeimg);
+imshow(Vim);
+figure;
+imwrite(Vim,'4_ver.bmp');
+
+
+
+%% % % %颜色聚类分割处理% % % % % % % % % % % % % % % 
+segmented_images = F_constellation(nI); %颜色聚类函数
+%imshow(segmented_images{1}), title('分割结果——区域1');figure;
+%imshow(segmented_images{2}), title('分割结果——区域2');figure;
+%imshow(segmented_images{3}), title('分割结果——区域3');
+
+%% % % %垂直线推断区域检测% % % % % % % % % % % % % %
+ver_regionimg = F_VerRegionDetection(Vim,Bw);
+imshow(ver_regionimg);
+figure;
+
+%% % % %竖直区域推理%%  %  %
+V1=segmented_images{3}+segmented_images{4};  %
+V1=im2bw(V1*10);
+V2=im2bw(ver_regionimg);
+V3=V1|V2;
+Skey=im2bw(segmented_images{1});
+V=V3-Skey;
+
+RI=double(I(:,:,1));
+GI=double(I(:,:,2));
+BI=double(I(:,:,3));
+RI=RI(Msize:M-Msize,Msize:N-Msize);
+GI=GI(Msize:M-Msize,Msize:N-Msize);
+BI=BI(Msize:M-Msize,Msize:N-Msize);
+
+Iver(:,:,1)=RI.*double(V);
+Iver(:,:,2)=GI.*double(V);
+Iver(:,:,3)=BI.*double(V);
+
+imwrite(uint8(Iver),'l1_Final_Vertical.bmp');
+
+
+%% % % %地面区域推理%%  %  %
+Skey=im2bw(segmented_images{1});
+P=~(V+Skey);
+
+Iplane(:,:,1)=RI.*double(P);
+Iplane(:,:,2)=GI.*double(P);
+Iplane(:,:,3)=BI.*double(P);
+
+imwrite(uint8(Iplane),'l1_Final_Plane.bmp');
+
+%% % % %深度关系处理%%  %  %
+depthimg=zeros(size(Bw));
+yvan=vanpoint(1,2);
+step=255/yvan;
+idep=255;
+for left=1:yvan
+    depthimg(:,left)=idep;
+    idep=idep-step;
+end
+
+step=255/(N-yvan);
+idep=255;
+for right=N-2*Msize+1:-1:yvan
+    depthimg(:,right)=idep;
+    idep=idep-step;
+end
+
+Dep_Vertical=depthimg.*V;
+
+dep_plane = F_confirmdepth(Bw,vanpoint);
+Dep_Plane=dep_plane.*P;
+
+Depthimg=zeros(size(Bw));
+Depthimg=Dep_Vertical+Dep_Plane;
+imshow(uint8(Depthimg));
+
+imwrite(uint8(Depthimg),'l1_depth.bmp');
+

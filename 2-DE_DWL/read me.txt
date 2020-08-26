@@ -1,0 +1,20 @@
+
+1、main----主函数；
+
+2、F_Segmentation -----基于边缘连接的图像分割；
+
+3、F_Regioncolor-----区域颜色主成分；
+
+4、linecoding-----边缘图像编码处理；
+
+5、F_ParaLineDetection-----平行线检测处理；
+
+6、F_VerLineDetection-----垂直线检测；
+
+7、F_vanpointdetection-----消失点检测处理；
+
+8、F_constellation-----颜色聚类分割处理；
+
+9、F_VerRegionDetection-----垂直线推断区域检测；
+
+10、地面位置推理和深度关系估计都需要手动操作
