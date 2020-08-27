@@ -48,6 +48,7 @@ for i = length(slValue):-1:1
         break;
     end
 end
+
 flag1 = 0;
 if slEdgeRight-slEdgeLeft > 2
     for i = 1:length(slValue)
@@ -76,8 +77,8 @@ if slEdgeRight-slEdgeLeft > 2
             meanValue2 = meanValue2 + slope2(i,1);
         end
     end
-    slValueLeft = meanValue1/meanNum1-0.1; %%斜率边界    
-    slValueRight = meanValue2/meanNum2+0.1;    
+    slValueLeft = meanValue1/meanNum1-0.05; %%斜率边界    
+    slValueRight = meanValue2/meanNum2+0.05;    
     
 else
     meanValue = 0;
@@ -88,8 +89,8 @@ else
             meanValue = meanValue + slope2(i,1);
         end
     end
-    slValueLeft = meanValue/meanNum-0.1; %%斜率边界
-    slValueRight = meanValue/meanNum+0.1; 
+    slValueLeft = meanValue/meanNum-0.03; %%斜率边界
+    slValueRight = meanValue/meanNum+0.03; 
 end
 
 
@@ -142,7 +143,7 @@ for m = 1:dirlistT_lens
         end 
     end
 end
-figure('Name','斜率约束'),imshow(imgSlope);
+% figure('Name','斜率约束'),imshow(imgSlope);
 % %% 延长线
 % imgSlope = zeros(M+2*Msize,N+2*Msize);
 % for m = 1:dirlistT_lens
