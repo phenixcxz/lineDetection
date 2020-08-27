@@ -2,7 +2,7 @@ clear all
 close all
 
 warning off
-im=imread('dsc00037.jpg');
+im=imread('dsc00293.jpg');
 lineT=20;
 %%旋转图像
 % im = imrotate(im,90);
@@ -112,6 +112,11 @@ for m = 1:dirlistT_lens
 end
 
 figure('Name','斜率约束+梯度约束'),imshow(imgResult);
+
+%% 直线拟合
+
+
+
 
 
 
