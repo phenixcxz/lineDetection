@@ -82,7 +82,7 @@ end
 %% 获取颜色梯度信息
 [grads1,grads2] = gradsDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize);
 %% 获取斜率信息
-[slope,slValueLeft,slValueRight,slopeX,slopeY] = slopeDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize);
+[slope,slValueLeft,slValueRight,slopeX] = slopeDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize);
 
 imgResult = zeros(M+2*Msize,N+2*Msize);
 for m = 1:dirlistT_lens
@@ -92,18 +92,18 @@ for m = 1:dirlistT_lens
         aaMin = min(aa(:,1));
         for n = aaMin:aaMax
             xx = n;
-            yy = round(n*slope(m,1)+slope(m,2));
+            yy = round(n*tan(slope(m,1))+slope(m,2));
             if yy < N+2*Msize && yy >= 1
                 imgResult(xx,yy) = 255;
             end
         end
-    elseif slopeY(m,1) == 1 && (grads2(m,3)>0 || grads1(m,3) >0)
+    elseif slopeX(m,1) == 2 && (grads2(m,3)>0 || grads1(m,3) >0)
         aa = dirlist_lineT{m};        
         aaMax = max(aa(:,2));
         aaMin = min(aa(:,2));
         for n = aaMin:aaMax
             yy = n;
-            xx = round((yy-slope(m,2))/slope(m,1));
+            xx = round((yy-slope(m,2))/tan(slope(m,1)));
             if xx < M+2*Msize && xx >= 1
                 imgResult(xx,yy) = 255;
             end
