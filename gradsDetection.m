@@ -59,7 +59,7 @@ for m = 1:dirlistT_lens
         end
     end
 end
-figure('Name','横向梯度约束'),imshow(imgGrads1);
+% figure('Name','横向梯度约束'),imshow(imgGrads1);
 
 %% 纵向梯度约束 
 imgGrads2 = zeros(M+2*Msize,N+2*Msize);
@@ -72,6 +72,6 @@ for m = 1:dirlistT_lens
         end
     end
 end
-figure('Name','纵向梯度约束'),imshow(imgGrads2);
+% figure('Name','纵向梯度约束'),imshow(imgGrads2);
 
 end
