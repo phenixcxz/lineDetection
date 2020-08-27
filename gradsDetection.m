@@ -4,7 +4,8 @@ grads1 = zeros(dirlistT_lens,3);
 gap = 5;
 for m=1:dirlistT_lens
     aa = dirlist_lineT{m};
-    [num,t] = size(aa);
+%     [num,t] = size(aa);
+    num = length(aa);
     for n = 1:size(aa)
         x=aa(n,1);
         y=aa(n,2);
@@ -29,7 +30,8 @@ grads2 = zeros(dirlistT_lens,3);
 gap = 5;
 for m=1:dirlistT_lens
     aa = dirlist_lineT{m};
-    [num,t] = size(aa);
+%     [num,t] = size(aa);
+    num = length(aa);
     for n = 1:size(aa)
         x=aa(n,1);
         y=aa(n,2);
@@ -48,30 +50,31 @@ for m=1:dirlistT_lens
         grads2(m,3) = 1;
     end
 end
-%% 横向梯度约束 
-imgGrads1 = zeros(M+2*Msize,N+2*Msize);
-for m = 1:dirlistT_lens
-    aa = dirlist_lineT{m};
-%     [x,y] = size(aa);
-    if grads1(m,3)>0
-        for n = 1:size(aa)
-            imgGrads1(aa(n,1),aa(n,2)) = 255;
-        end
-    end
-end
-% figure('Name','横向梯度约束'),imshow(imgGrads1);
-
-%% 纵向梯度约束 
-imgGrads2 = zeros(M+2*Msize,N+2*Msize);
-for m = 1:dirlistT_lens
-    aa = dirlist_lineT{m};
-%     [x,y] = size(aa);
-    if grads2(m,3)>0
-        for n = 1:size(aa)
-            imgGrads2(aa(n,1),aa(n,2)) = 255;
-        end
-    end
-end
-% figure('Name','纵向梯度约束'),imshow(imgGrads2);
+%% 梯度约束图形化显示
+% %% 横向梯度约束 
+% imgGrads1 = zeros(M+2*Msize,N+2*Msize);
+% for m = 1:dirlistT_lens
+%     aa = dirlist_lineT{m};
+% %     [x,y] = size(aa);
+%     if grads1(m,3)>0
+%         for n = 1:size(aa)
+%             imgGrads1(aa(n,1),aa(n,2)) = 255;
+%         end
+%     end
+% end
+% % figure('Name','横向梯度约束'),imshow(imgGrads1);
+% 
+% %% 纵向梯度约束 
+% imgGrads2 = zeros(M+2*Msize,N+2*Msize);
+% for m = 1:dirlistT_lens
+%     aa = dirlist_lineT{m};
+% %     [x,y] = size(aa);
+%     if grads2(m,3)>0
+%         for n = 1:size(aa)
+%             imgGrads2(aa(n,1),aa(n,2)) = 255;
+%         end
+%     end
+% end
+% % figure('Name','纵向梯度约束'),imshow(imgGrads2);
 
 end

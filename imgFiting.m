@@ -82,45 +82,36 @@ end
 %% 获取颜色梯度信息
 [grads1,grads2] = gradsDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize);
 %% 获取斜率信息
-[slValueLeft,slValueRight] = slopeDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize);
+[slope,slValueLeft,slValueRight,slopeX,slopeY] = slopeDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize);
 
-%% 斜率约束+梯度约束
 imgResult = zeros(M+2*Msize,N+2*Msize);
 for m = 1:dirlistT_lens
-    aa = dirlist_lineT{m};
-    aaLen = length(aa);
-    p = polyfit(aa(4:aaLen-3,1),aa(4:aaLen-3,2),1);
-    aaSlope = p(1);
-    aaDot = p(2);
-    if aaSlope(1) <1 && aaSlope > -1 
-        if aaSlope>slValueLeft && aaSlope < slValueRight && (grads2(m,3)>0 || grads1(m,3) >0)
-            aaMax = max(aa(:,1));
-            aaMin = min(aa(:,1));
-            for n = aaMin:aaMax
-                xx = n;
-                yy = round(n*aaSlope+aaDot);
-                if yy < N+2*Msize && yy >= 1
-                    imgResult(xx,yy) = 255;
-                end
+    if slopeX(m,1) == 1 && (grads2(m,3)>0 || grads1(m,3) >0)
+        aa = dirlist_lineT{m};
+        aaMax = max(aa(:,1));
+        aaMin = min(aa(:,1));
+        for n = aaMin:aaMax
+            xx = n;
+            yy = round(n*slope(m,1)+slope(m,2));
+            if yy < N+2*Msize && yy >= 1
+                imgResult(xx,yy) = 255;
             end
         end
-    else
-        if aaSlope > slValueLeft && aaSlope < slValueRight && (grads2(m,3)>0 || grads1(m,3) >0)
-            aaMax = max(aa(:,2));
-            aaMin = min(aa(:,2));
-            for n = aaMin:aaMax
-                yy = n;
-                xx = round((yy-aaDot)/aaSlope);
-                if xx < M+2*Msize && xx >= 1
-                    imgResult(xx,yy) = 255;
-                end
-            end 
-        end
+    elseif slopeY(m,1) == 1 && (grads2(m,3)>0 || grads1(m,3) >0)
+        aa = dirlist_lineT{m};        
+        aaMax = max(aa(:,2));
+        aaMin = min(aa(:,2));
+        for n = aaMin:aaMax
+            yy = n;
+            xx = round((yy-slope(m,2))/slope(m,1));
+            if xx < M+2*Msize && xx >= 1
+                imgResult(xx,yy) = 255;
+            end
+        end 
     end
 end
 
 figure('Name','斜率约束+梯度约束'),imshow(imgResult);
-
 
 
 

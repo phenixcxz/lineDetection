@@ -1,4 +1,4 @@
-function [slope,slValueLeft,slValueRight,slopeX,slopeY]=slopeDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize)
+function [slValueLeft,slValueRight,s]=slopeDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize)
 %% 直线拟合+信息统计
 % imgdown = zeros(M+2*Msize,N+2*Msize);
 slope=zeros(dirlistT_lens,3);       %斜率计算
@@ -48,11 +48,10 @@ end
 % figure('Name','直线拟合'),imshow(imgdown);
 %% 斜率排序
 
-slope2 = slope;
 [~,pos] = sort(slope(:,3));
-slope2(:,3) = slope(pos,3);
-slope2(:,2) = slope(pos,2);
-slope2(:,1)= slope(pos,1);
+slope(:,3) = slope(pos,3);
+slope(:,2) = slope(pos,2);
+slope(:,1)= slope(pos,1);
 
 %% 寻找适合斜率
 % [slsize,y] = size(slope);
@@ -83,9 +82,9 @@ end
 meanValue = 0;
 meanNum = 0;
 for i = slsize-dotNum+1:slsize
-    if slope2(i,1)>slEdgeLeft && slope2(i,1) < slEdgeRight
+    if slope(i,1)>slEdgeLeft && slope(i,1) < slEdgeRight
         meanNum = meanNum+1;
-        meanValue = meanValue + slope2(i,1);
+        meanValue = meanValue + slope(i,1);
     end
 end
 
@@ -96,49 +95,38 @@ else
     slValueLeft = meanValue/meanNum*3/2; %%斜率边界
     slValueRight = meanValue/meanNum*1/2; 
 end
-
-slopeX = zeros(dirlistT_lens,1);
-slopeY = zeros(dirlistT_lens,1);
-for m = 1:dirlistT_lens
-    aa = dirlist_lineT{m};
-    aaLen = length(aa);
-    p = polyfit(aa(4:aaLen-3,1),aa(4:aaLen-3,2),1);
-    aaSlope = p(1);
-    if aaSlope(1) <1 && aaSlope > -1 
-        if aaSlope>slValueLeft && aaSlope < slValueRight
-            slopeX(m,1) = 1;
-        end
-    else
-        if aaSlope > slValueLeft && aaSlope < slValueRight
-            slopeY(m,1) = 1;
-        end
-    end
-end
-
+% 
 % imgSlope = zeros(M+2*Msize,N+2*Msize);
 % for m = 1:dirlistT_lens
-%     if slopeX(m,1) == 1
-%         aa = dirlist_lineT{m};
-%         aaMax = max(aa(:,1));
-%         aaMin = min(aa(:,1));
-%         for n = aaMin:aaMax
-%             xx = n;
-%             yy = round(n*slope(m,1)+slope(m,2));
-%             if yy < N+2*Msize && yy >= 1
-%                 imgSlope(xx,yy) = 255;
+%     aa = dirlist_lineT{m};
+%     aaLen = length(aa);
+%     p = polyfit(aa(4:aaLen-3,1),aa(4:aaLen-3,2),1);
+%     aaSlope = p(1);
+%     aaDot = p(2);
+%     if aaSlope(1) <1 && aaSlope > -1 
+%         if aaSlope>slValueLeft && aaSlope < slValueRight
+%             aaMax = max(aa(:,1));
+%             aaMin = min(aa(:,1));
+%             for n = aaMin:aaMax
+%                 xx = n;
+%                 yy = round(n*aaSlope+aaDot);
+%                 if yy < N+2*Msize && yy >= 1
+%                     imgSlope(xx,yy) = 255;
+%                 end
 %             end
 %         end
-%     elseif slopeY(m,1) == 1 
-%         aa = dirlist_lineT{m};        
-%         aaMax = max(aa(:,2));
-%         aaMin = min(aa(:,2));
-%         for n = aaMin:aaMax
-%             yy = n;
-%             xx = round((yy-slope(m,2))/slope(m,1));
-%             if xx < M+2*Msize && xx >= 1
-%                 imgSlope(xx,yy) = 255;
+%     else
+%         if aaSlope > slValueLeft && aaSlope < slValueRight
+%             aaMax = max(aa(:,2));
+%             aaMin = min(aa(:,2));
+%             for n = aaMin:aaMax
+%                 yy = n;
+%                 xx = round((yy-aaDot)/aaSlope);
+%                 if xx < M+2*Msize && xx >= 1
+%                     imgSlope(xx,yy) = 255;
+%                 end
 %             end
-%         end 
+%         end
 %     end
 % end
 % figure('Name','斜率约束'),imshow(imgSlope);
