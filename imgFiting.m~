@@ -2,7 +2,7 @@ clear all
 close all
 
 warning off
-im=imread('DSC00006.jpg');
+im=imread('DSC00046.jpg');
 lineT=20;
 %%旋转图像
 % im = imrotate(im,90);
@@ -20,7 +20,6 @@ im = imresize(im,[480,640]);
 
 Img=im(:,:,3);
 figure('Name','灰度图'), imshow(Img);
-
 
 
 % Img = imadjust(Img);      %增强对比度
@@ -99,7 +98,8 @@ imgResult = zeros(M+2*Msize,N+2*Msize);
 
 lineNum = 0;
 for m = 1:dirlistT_lens
-    if slopeX(m,1) == 1 && (grads2(m,3)>0 || grads1(m,3) >0)
+%     if slopeX(m,1) == 1 && (grads2(m,3)>0 || grads1(m,3) >0)
+    if slopeX(m,1) == 1 && grads1(m,3)>0 
         aa = dirlist_lineT{m};
         aaMax = max(aa(:,1));
         aaMin = min(aa(:,1));
@@ -159,11 +159,11 @@ for m = lineNum:-1:1
     aa = dirlist_lineT{slope2(m,4)};
     xx1 = min(aa(:,1));
     xx2 = max(aa(:,1));
-    yy = round(n*tan(slope2(m,1))+slope2(m,2));
+%     yy = round(*tan(slope2(m,1))+slope2(m,2));
     for xx = xx1-1:-1:Msize
         yy = round(xx*tan(slope2(m,1))+slope2(m,2));
-        if yy < N+2*Msize && yy >= 1 
-            if imgResult3(xx,yy) == 0
+        if yy < N+2*Msize && yy >1 
+            if imgResult3(xx,yy)==0 &&imgResult3(xx,yy+1)==0 && imgResult3(xx,yy-1)==0
                 imgResult3(xx,yy) = 255;
             else
                 break;
@@ -172,93 +172,180 @@ for m = lineNum:-1:1
     end
     for xx = xx2+1:M+Msize
         yy = round(xx*tan(slope2(m,1))+slope2(m,2));
-        if yy < N+2*Msize && yy >= 1 
+        if yy < N+2*Msize && yy > 1 
             if imgResult3(xx,yy)==0 &&imgResult3(xx,yy+1)==0 && imgResult3(xx,yy-1)==0
                 imgResult3(xx,yy) = 255;
-            elseif imgResult3(xx,yy) == 255
+            else
                 break;
             end 
         end
     end  
 end
 figure('Name','延长线'),imshow(uint8(imgResult3));
+
+
 %% 直线拟合
-imgResult2 = img;
-for m = 1:dirlistT_lens
-    if slopeX(m,1) == 1 
-        if grads1(m,3) >0
-            temp = 0;
-            numtemp = 0;
-            if grads1(m,3)==1 %&& slope(m,3)>120
-                aa = dirlist_lineT{m};
-                aaMax = max(aa(:,1));
-                aaMin = min(aa(:,1));
-                for n = Msize+1:M+Msize
-%                 for n = aaMin:aaMax
-                    xx = n;
-                    yy = round(n*tan(slope(m,1))+slope(m,2));
-%                     temp
-                    if yy < N+2*Msize && yy >= 1
-                        imgResult2(xx,yy+1) = 255;
-                    end
-                end
-            else %slope(m,3)>120
-                aa = dirlist_lineT{m};
-                aaMax = max(aa(:,1));
-                aaMin = min(aa(:,1));
-                for n = Msize+1:M+Msize
-%                 for n = aaMin:aaMax
-                    xx = n;
-                    yy = round(n*tan(slope(m,1))+slope(m,2));
-                    if yy < N+2*Msize && yy > 1
-                        imgResult2(xx,yy-1) = 255;
-                    end
-                end                
-            end
-        elseif grads2(m,3) > 0
-            aa = dirlist_lineT{m};
-            aaMax = max(aa(:,1));
-            aaMin = min(aa(:,1));
-            for n = aaMin:aaMax
-                xx = n;
-                yy = round(n*tan(slope(m,1))+slope(m,2));
-                if yy < N+2*Msize && yy >= 1
-                    imgResult2(xx,yy-1) = 255;
-                    imgResult2(xx,yy-2) = 255;
-                    imgResult2(xx,yy-3) = 255;
-                end
-            end 
-        end
-    elseif slopeX(m,1) == 2
-        if grads1(m,3)>0 
-        aa = dirlist_lineT{m};        
-        aaMax = max(aa(:,2));
-        aaMin = min(aa(:,2));
-        for n = aaMin:aaMax
-            yy = n;
-            xx = round((yy-slope(m,2))/tan(slope(m,1)));
-            if xx < M+2*Msize && xx >= 1
-                imgResult2(xx+1,yy) = 255;
-                imgResult2(xx+2,yy) = 255;
-            end
-        end
-        elseif grads2(m,3)>0
-            aa = dirlist_lineT{m};        
-            aaMax = max(aa(:,2));
-            aaMin = min(aa(:,2));
-            for n = aaMin:aaMax
-%             for n = aaMin:aaMax
-                yy = n;
-                xx = round((yy-slope(m,2))/tan(slope(m,1)));
-                if xx < M+2*Msize && xx >= 1
-                imgResult2(xx-1,yy) = 255;
-                imgResult2(xx-2,yy) = 255;
-                end
-            end
-        end 
+imgResult4 = uint8(img) ;
+% lineNum = 0;
+% for m = lineNum:-1:1
+%     aa = dirlist_lineT{slope2(m,4)};
+%     xx1 = min(aa(:,1));
+%     xx2 = max(aa(:,1));
+% %     yy = round(*tan(slope2(m,1))+slope2(m,2));
+%     for xx = xx1-1:-1:Msize
+%         yy = round(xx*tan(slope2(m,1))+slope2(m,2));
+%         if yy < N+2*Msize && yy >1 
+%             if imgResult3(xx,yy)==0 &&imgResult3(xx,yy+1)==0 && imgResult3(xx,yy-1)==0
+%                 imgResult3(xx,yy) = 255;
+%             else
+%                 break;
+%             end
+%         end
+%     end
+%     for xx = xx2+1:M+Msize
+%         yy = round(xx*tan(slope2(m,1))+slope2(m,2));
+%         if yy < N+2*Msize && yy > 1 
+%             if imgResult3(xx,yy)==0 &&imgResult3(xx,yy+1)==0 && imgResult3(xx,yy-1)==0
+%                 imgResult3(xx,yy) = 255;
+%             else
+%                 break;
+%             end 
+%         end
+%     end  
+% end
+
+
+%% 投票选出直线
+%中点，斜率，斜率票数，左边缘票数，右边缘票数，线宽1票数，线宽2票数，线宽3票数，线宽4票数
+% devote = zeros(dirlistT_lens,9);
+% imgResult4 = uint8(imgResult) ;
+% lineNum = 0;
+% for m = 1:dirlistT_lens
+%     devote(m,1) = slope(m,5);   %中点
+%     devote(m,2) = slope(m,1);   %斜率
+%     devote(m,3) = slope(m,3);   %斜率票数
+%     devote(m,4) = grads1(m,1);  %左边缘票数
+%     devote(m,5) = grads1(m,2);  %右边缘票数
+%     devote(m,6) = grads1(m,4)+grads1(m,8);      %线宽1票数
+%     devote(m,7) = grads1(m,5)+grads1(m,9);      %线宽2票数
+%     devote(m,8) = grads1(m,6)+grads1(m,10);     %线宽3票数
+%     devote(m,9) = grads1(m,7)+grads1(m,11);     %线宽4票数
+% end
+% figure('Name','延长线'),imshow(uint8(imgResult3));
+
+
+
+%% 线信息统计
+devote = zeros(lineNum,9);
+for n = 1:lineNum
+    m = slope2(n,4);
+    devote(n,1) = slope(m,5);   %中点
+    devote(n,2) = slope(m,1);   %斜率
+    devote(n,3) = slope(m,3);   %斜率票数
+    devote(n,4) = grads1(m,1);  %左边缘票数
+    devote(n,5) = grads1(m,2);  %右边缘票数
+    devote(n,6) = grads1(m,4)+grads1(m,8);      %线宽1票数
+    devote(n,7) = grads1(m,5)+grads1(m,9);      %线宽2票数
+    devote(n,8) = grads1(m,6)+grads1(m,10);     %线宽3票数
+    devote(n,9) = grads1(m,7)+grads1(m,11);     %线宽4票数
+end
+
+%% 平均弧度
+slNum = 0;
+slSum = 0;
+slBorder = 0;
+aveSlope = 0;
+if slValueLeft> slValueRight
+    slBorder = 1;
+%     aveSlope = (slValueLeft +slValueRight-pi)/2;    
+% else
+%     aveSlope = (slValueLeft +slValueRight)/2; 
+end
+
+    
+for m = 1:lineNum
+    slNum = slNum+devote(m,3);
+    if slBorder >0 && devote(m,2)>3
+        slSum = slSum+(devote(m,2)-pi)*devote(m,3);
+    else
+        slSum = slSum+devote(m,2)*devote(m,3);
     end
 end
-figure('Name','原图显示'),imshow(uint8(imgResult2));
+aveSlope = slSum/slNum;
+
+
+% aveSlope = (slValueLeft+slValueRight)/2;
+%% 归一化
+% 左起始点，右起始点，票数
+devoteFun = zeros(lineNum,3);
+for m = lineNum:-1:1
+    [num,x] = max(devote(m,6:9));
+    if devote(m,4) > devote(m,5)
+        devoteFun(m,1) = devote(m,1)+1;
+        devoteFun(m,2) = devoteFun(m,1)+x;
+        devoteFun(m,3) = 
+    else
+        devoteFun(m,1) = devote(n,1)-x-1;
+        devoteFun(m,2) = devoteFun(m,1)+x;        
+    end
+end
+
+% 区间排序
+[~,pos] = sort(devoteFun(:,1));
+devoteFun(:,1) = devoteFun(pos,1);
+devoteFun(:,2) = devoteFun(pos,2);
+
+%和并重复区间
+devote2 = zeros(lineNum,3);
+num = 0;
+m = 1;
+while(m <=lineNum) 
+    num = num+1;
+    devote2(num,1) = devoteFun(m,1);
+    devote2(num,2) = devoteFun(m,2);
+    devote2(num,3) = devoteFun(m,2);
+    for n = m+1:lineNum
+        if devoteFun(n,1) <= devote2(num,2)  %区间重合合并
+            if devoteFun(n,2) > devote2(num,2)
+                devote2(num,2) = devoteFun(n,2);
+            else
+                continue;
+            end
+        else
+            m = n;
+            break;
+        end
+    end
+    if devote2(num,2) >= devoteFun(lineNum,2)
+        break;
+    end
+    m = m+1;
+end
+
+%% 画出拟合直线
+
+imgResult4 = uint8(img) ;
+for m = 1:lineNum
+    for n = devoteFun(m,1):devoteFun(m,2)
+        b = n-tan(aveSlope)*(M/2+Msize);
+        for xx = Msize:Msize+M
+            yy = round(xx*tan(aveSlope)+b);
+            if yy >=1 && yy < N+Msize
+                imgResult4(xx,yy) = 255;
+            end
+        end
+    end
+end
+        
+figure('Name','直线拟合'),imshow(uint8(imgResult4));
+
+
+
+    
+
+
+
+
 
 
 

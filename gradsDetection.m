@@ -1,7 +1,32 @@
 %% 寻找横向梯度
 function [grads1,grads2]=gradsDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize)
-grads1 = zeros(dirlistT_lens,3);
+%左边缘标志，右边缘标志，左1，左2，左3，左4，右1，右2，右3，右4，左和，右和
+grads1 = zeros(dirlistT_lens,12);
 gap = 5;
+% for m=1:dirlistT_lens
+%     aa = dirlist_lineT{m};
+%     num = length(aa);
+%     for n = 1:size(aa)
+%         x=aa(n,1);
+%         y=aa(n,2);
+%         if img(x,y+1) - img(x,y) > gap   %左边缘
+%             if img(x,y+2) - img(x,y+3) > gap || img(x,y+3) - img(x,y+4) > gap %右边缘
+%                 grads1(m,1) = grads1(m,1)+1;
+%             end
+%         end
+%         if img(x,y-1) - img(x,y) > gap   %右边缘
+%             if img(x,y-2) - img(x,y-3) > gap || img(x,y-3) - img(x,y-4) > gap %左边缘
+%                 grads1(m,2) = grads1(m,2)+1;
+%             end            
+%         end
+%     end
+%     if grads1(m,1)/num >3/5 
+%         grads1(m,3) = 1;
+%     elseif grads1(m,2)/num > 3/5
+%         grads1(m,3) = 2;
+%     end
+% end
+
 for m=1:dirlistT_lens
     aa = dirlist_lineT{m};
     num = length(aa);
@@ -9,16 +34,38 @@ for m=1:dirlistT_lens
         x=aa(n,1);
         y=aa(n,2);
         if img(x,y+1) - img(x,y) > gap   %左边缘
-            if img(x,y+2) - img(x,y+3) > gap || img(x,y+3) - img(x,y+4) > gap %右边缘
-                grads1(m,1) = grads1(m,1)+1;
+%             if img(x,y+2) - img(x,y+3) > gap || img(x,y+3) - img(x,y+4) > gap %右边缘
+%                 grads1(m,1) = grads1(m,1)+1;
+%             end
+            if img(x,y+1)-img(x,y+2)>gap
+                grads1(m,4) = grads1(m,4)+1;
+            elseif img(x,y+2)-img(x,y+3)>gap
+                grads1(m,5) = grads1(m,5)+1;
+            elseif img(x,y+3)-img(x,y+4) > gap
+                grads1(m,6) = grads1(m,6)+1;
+            elseif img(x,y+4)-img(x,y+5) > gap
+                grads1(m,7) = grads1(m,7)+1;
             end
+            
+                
         end
         if img(x,y-1) - img(x,y) > gap   %右边缘
-            if img(x,y-2) - img(x,y-3) > gap || img(x,y-3) - img(x,y-4) > gap %左边缘
-                grads1(m,2) = grads1(m,2)+1;
-            end            
+%             if img(x,y-2) - img(x,y-3) > gap || img(x,y-3) - img(x,y-4) > gap %左边缘
+%                 grads1(m,2) = grads1(m,2)+1;
+%             end 
+            if img(x,y-1)-img(x,y-2)>gap
+                grads1(m,8) = grads1(m,8)+1;
+            elseif img(x,y-2)-img(x,y-3)>gap
+                grads1(m,9) = grads1(m,9)+1;
+            elseif img(x,y-3)-img(x,y-4) > gap
+                grads1(m,10) = grads1(m,10)+1;
+            elseif img(x,y-4)-img(x,y-5)>gap
+                grads1(m,11) = grads1(m,11)+1;
+            end
         end
     end
+    grads1(m,1) = grads1(m,4)+grads1(m,5)+grads1(m,6)+grads1(m,7);
+    grads1(m,2) = grads1(m,8)+grads1(m,9)+grads1(m,10)+grads1(m,11);
     if grads1(m,1)/num >3/5 
         grads1(m,3) = 1;
     elseif grads1(m,2)/num > 3/5
