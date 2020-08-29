@@ -2,8 +2,8 @@ clear all
 close all
 
 warning off
-im=imread('DSC00038.jpg');
-lineT=20;
+im=imread('DSC00222.jpg');
+lineT=30;
 %%旋转图像
 % im = imrotate(im,90);
 % im = imresize(im,[640,480]);
@@ -257,21 +257,19 @@ slBorder = 0;
 aveSlope = 0;
 if slValueLeft> slValueRight
     slBorder = 1;
-%     aveSlope = (slValueLeft +slValueRight-pi)/2;    
-% else
-%     aveSlope = (slValueLeft +slValueRight)/2; 
+    aveSlope = (slValueLeft +slValueRight-pi)/2;    
+else
+    aveSlope = (slValueLeft +slValueRight)/2; 
 end
-
-    
-for m = 1:lineNum
-    slNum = slNum+devote(m,3);
-    if slBorder >0 && devote(m,2)>3
-        slSum = slSum+(devote(m,2)-pi)*devote(m,3);
-    else
-        slSum = slSum+devote(m,2)*devote(m,3);
-    end
-end
-aveSlope = slSum/slNum;
+% for m = 1:lineNum
+%     slNum = slNum+devote(m,3);
+%     if slBorder >0 && devote(m,2)>3
+%         slSum = slSum+(devote(m,2)-pi)*devote(m,3);
+%     else
+%         slSum = slSum+devote(m,2)*devote(m,3);
+%     end
+% end
+% aveSlope = slSum/slNum;
 
 
 % aveSlope = (slValueLeft+slValueRight)/2;
@@ -279,7 +277,8 @@ aveSlope = slSum/slNum;
 % 左起始点，右起始点，票数
 devoteFun = zeros(lineNum,3);
 for m = lineNum:-1:1
-    [num,x] = max(devote(m,6:9));
+%     [num,x] = max(devote(m,6:9));
+    x = round((devote(m,6)*1+devote(m,7)*2+devote(m,8)*3+devote(m,9)*4)/(devote(m,6)+devote(m,7)+devote(m,8)+devote(m,9)));
     if devote(m,4) > devote(m,5)
         devoteFun(m,1) = devote(m,1)+1;
         devoteFun(m,2) = devoteFun(m,1)+x;
@@ -300,29 +299,49 @@ devoteFun(:,3) = devoteFun(pos,3);
 devote2 = zeros(lineNum,3);
 num = 0;
 m = 1;
+% while(m <=lineNum) 
+%     num = num+1;
+%     devote2(num,1) = devoteFun(m,1);
+%     devote2(num,2) = devoteFun(m,2);
+%     devote2(num,3) = devoteFun(m,3);
+%     for n = m+1:lineNum
+%         if devoteFun(n,1) <= devote2(num,2)  %区间重合合并
+%             devote2(num,3) = devote2(num,3)+devoteFun(n,3);        %统计票数        
+%             if devoteFun(n,2) > devote2(num,2)
+%                 devote2(num,2) = devoteFun(n,2);   
+%             else
+%                 continue;
+%             end
+%         else
+%             m = n;
+%             break;
+%         end
+%     end
+%     if devote2(num,2) >= devoteFun(lineNum,2)
+%         break;
+%     end
+%     m = m+1;
+% end
 while(m <=lineNum) 
     num = num+1;
     devote2(num,1) = devoteFun(m,1);
     devote2(num,2) = devoteFun(m,2);
     devote2(num,3) = devoteFun(m,3);
-    for n = m+1:lineNum
-        if devoteFun(n,1) <= devote2(num,2)  %区间重合合并
-            devote2(num,3) = devote2(num,3)+devoteFun(n,3);        %统计票数        
-            if devoteFun(n,2) > devote2(num,2)
-                devote2(num,2) = devoteFun(n,2);   
-            else
-                continue;
-            end
-        else
-            m = n;
-            break;
+    ind = find(devote2(num,2)<devoteFun(:,1));
+    if length(ind) == 0     %合并最后一条线
+        for n = m+1:lineNum
+           devote2(num,3) = devote2(num,3)+devoteFun(n,3);
         end
-    end
-    if devote2(num,2) >= devoteFun(lineNum,2)
         break;
     end
-    m = m+1;
+    
+    %% 统计票数
+    for n = m+1:ind(1)-1    %统计票数
+        devote2(num,3) = devote2(num,3)+devoteFun(n,3);
+    end
+    m = ind(1);
 end
+
 
 %% 画出拟合直线
 

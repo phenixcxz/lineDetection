@@ -6,7 +6,7 @@ slope=zeros(dirlistT_lens,5);       %斜率计算
 for m=1:dirlistT_lens
     aa=dirlist_lineT{m};  %待处理线段
     x = length(aa);
-    p = polyfit(aa(round(x/10):round(x*9/10),1),aa(round(x*1/10):round(x*9/10),2),1);     %线段斜率与起始点
+    p = polyfit(aa(round(x*2/10):round(x*8/10),1),aa(round(x*2/10):round(x*8/10),2),1);     %线段斜率与起始点
     slope(m,1) = atan(p(1));
     if slope(m,1) < 0
         slope(m,1) = 3.1415+slope(m,1);
