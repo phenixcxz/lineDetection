@@ -5,7 +5,7 @@ warning off
 im=imread('DSC00006.jpg');
 lineT=30;
 %%旋转图像
-% im = imrotate(im,90);
+% im = imrotate(im,45);
 % im = imresize(im,[640,480]);
 
 im = imresize(im,[480,640]);
@@ -34,7 +34,7 @@ figure('Name','灰度图'), imshow(Img);
 % figure('Name','LTP'), imshow(Img);
 %% canny算法
 bw = edge(Img,'canny');
-% figure('Name','边缘检测'),imshow(bw);
+figure('Name','边缘检测'),imshow(bw);
 
 %% alinecoding算法
 Model={};
@@ -326,14 +326,19 @@ while(m <=lineNum)
     num = num+1;
     devote2(num,1) = devoteFun(m,1);
     devote2(num,2) = devoteFun(m,2);
-%     devote2(num,3) = devoteFun(m,3);
+    devote2(num,3) = devoteFun(m,3);
     ind = find(devote2(num,2)<devoteFun(:,1));
-    if length(ind) == 0
+    if length(ind) == 0     %合并最后一条线
+        for n = m+1:lineNum
+           devote2(num,3) = devote2(num,3)+devoteFun(n,3);
+        end
         break;
     end
     
     %% 统计票数
-    for n = m:ind
+    for n = m+1:ind(1)-1    %统计票数
+        devote2(num,3) = devote2(num,3)+devoteFun(n,3);
+    end
     m = ind(1);
 end
 
@@ -342,7 +347,7 @@ end
 
 imgResult4 = uint8(img) ;
 for m = 1:lineNum
-    if devote2(m,3)>50
+    if devote2(m,3)>100
         for n = devote2(m,1):devote2(m,2)
             b = n-tan(aveSlope)*(M/2+Msize);
             for xx = Msize:Msize+M
@@ -356,6 +361,8 @@ for m = 1:lineNum
 end
         
 figure('Name','直线拟合'),imshow(uint8(imgResult4));
+
+[L,Lnum] = bwlabel(imgResult3,8);
 
 
 

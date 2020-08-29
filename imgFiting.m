@@ -2,10 +2,10 @@ clear all
 close all
 
 warning off
-im=imread('DSC00222.jpg');
+im=imread('DSC00006.jpg');
 lineT=30;
 %%旋转图像
-% im = imrotate(im,90);
+% im = imrotate(im,45);
 % im = imresize(im,[640,480]);
 
 im = imresize(im,[480,640]);
@@ -34,7 +34,7 @@ figure('Name','灰度图'), imshow(Img);
 % figure('Name','LTP'), imshow(Img);
 %% canny算法
 bw = edge(Img,'canny');
-% figure('Name','边缘检测'),imshow(bw);
+figure('Name','边缘检测'),imshow(bw);
 
 %% alinecoding算法
 Model={};
@@ -361,6 +361,8 @@ for m = 1:lineNum
 end
         
 figure('Name','直线拟合'),imshow(uint8(imgResult4));
+
+[L,Lnum] = bwlabel(imgResult3,8);
 
 
 
