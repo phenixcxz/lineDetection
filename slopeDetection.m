@@ -12,6 +12,7 @@ for m=1:dirlistT_lens
         slope(m,1) = 3.1415+slope(m,1);
     end
     slope(m,2) = round(p(2));       %起始点
+%     slope(m,5) = round(p(2));
     slope(m,5) = round(p(1)*(M/2+Msize)+p(2));      %中点
     slope(m,3) = x;                 %连续点个数
     
