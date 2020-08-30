@@ -2,7 +2,7 @@ clear all
 close all
 
 warning off
-im=imread('DSC00037.jpg');
+im=imread('DSC00042.jpg');
 lineT=30;
 %%旋转图像
 % im = imrotate(im,45);
@@ -299,10 +299,9 @@ imgResult10 = uint8(img) ;
 for m = 1:Lnum
     if devote11(m,3)>100
         for n = devote11(m,1):devote11(m,2)
-            b = n-tan(aveSlope)*(M/2+Msize);
-%             b = n-tan(devote2(m,4))*(M/2+Msize);
+            b = n-tan(devote11(m,4))*(M/2+Msize);
             for xx = Msize:Msize+M
-                yy = round(xx*tan(aveSlope)+b);
+                yy = round(xx*tan(devote11(m,4))+b);
                 if yy >=1 && yy < N+Msize
                     imgResult10(xx,yy) = 255;
                 end
