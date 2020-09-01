@@ -3,7 +3,7 @@ close all
 
 warning off
 
-name = './data/DSC00120';
+name = './data/DSC00132';
 nameJpg = [name,'.jpg'];
 nameJson = [name,'.json'];
 im=imread(nameJpg);
@@ -321,8 +321,7 @@ for m = 1:length(devote11)
             end
         end
     end
-end
-        
+end   
 figure('Name','直线拟合3'),imshow(uint8(imgResult10));
 
 
@@ -331,8 +330,8 @@ data=loadjson(nameJson);
 multiple = 1920/480;
 shapes = data.shapes;
 sLength = length(shapes);
-points = {6};
-for i = 1:6
+points = {sLength};
+for i = 1:sLength
     temp = shapes(i);
     points{i} = temp{1,1}.points;
 end
@@ -361,35 +360,47 @@ for i = 1:6
     result(i,4) = slope;
 end
 
-
+test = zeros(M+2*Msize,N+2*Msize);
 for m = 1:sLength
     slope = result(m,:);
     for n = slope(1,1):slope(1,2)
         for xx = Msize+1:Msize+M
             yy = round(xx*tan(slope(1,4))+n+Msize);
             if yy >=1 && yy < N+Msize
-                img(xx,yy) = 255;
+                test(xx,yy) = 255;
             end
         end
     end
 end
 
-figure('Name','数据标注'),imshow(uint8(img));
+figure('Name','数据标注'),imshow(uint8(test));
+
+
+
 
 % 1.面积重合率，2，斜率偏差率
 precision = zeros(6,6);
 
-for m = 1:sLength
-    %弧度偏差小于0.02认为拟合
-    if abs(result(m,4)-devote11(m,4))<0.02
-        precision(m,2) = 1;
+
+for m = 1:length(devote11)
+    testNum1 = 0;
+    testNum2 = 0;
+    for n = devote11(m,1):devote11(m,2)
+        b = n-tan(devote11(m,4))*(M/2+Msize);
+        for xx = Msize:Msize+M
+            yy = round(xx*tan(devote11(m,4))+b);
+            if test(xx,yy)==255
+                testNum1 = testNum1+1;
+            else
+                testNum2 = testNum2+1;
+            end
+        end
     end
-    %位置偏差
-    if devote11(m,1)+1 >= result(m,1)-2 & devote11(m,2)-1 <= result(m,2)+2
-        precision(m,1) = 1;
-    end
-    
-end
+    precision(m,1) = testNum1/(testNum1+testNum2);
+    precision(m,2) = testNum2/(testNum1+testNum2);
+end 
+
+
 
 
 
