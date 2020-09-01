@@ -36,21 +36,32 @@ slHist = histogram(slope2(slsize-dotNum+1:slsize,1),6);   %斜率直方图
 
 slValue = slHist.Values;
 slEdge = slHist.BinEdges;
+[maxSl,ord] = max(slValue);
+BinLimits = slHist.BinLimits(2) - slHist.BinLimits(1);
+if BinLimits<0.5
+   slEdgeLeft =  slEdge(1);
+   slEdgeRight = slEdge(7);
+elseif maxSl > dotNum/2
+    slEdgeLeft = slEdge(ord);
+    slEdgeRight = slEdge(ord+1);
+else
+    
 
-slEdgeLeft = 0;
-slEdgeRight = 0;
+    slEdgeLeft = 0;
+    slEdgeRight = 0;
 
-for i = 1:length(slValue)
-    if slValue(i) >= dotNum/5
-        slEdgeLeft = slEdge(i);
-        break;
+    for i = 1:length(slValue)
+        if slValue(i) >= dotNum/4
+            slEdgeLeft = slEdge(i);
+            break;
+        end
     end
+    for i = length(slValue):-1:1
+        if slValue(i) >= dotNum/5
+            slEdgeRight = slEdge(i+1);
+            break;
+        end
 end
-for i = length(slValue):-1:1
-    if slValue(i) >= dotNum/5
-        slEdgeRight = slEdge(i+1);
-        break;
-    end
 end
 
 flag1 = 0;
@@ -81,8 +92,8 @@ if slEdgeRight-slEdgeLeft > 2
             meanValue2 = meanValue2 + slope2(i,1);
         end
     end
-    slValueLeft = meanValue1/meanNum1-0.05; %%斜率边界    
-    slValueRight = meanValue2/meanNum2+0.05;    
+    slValueLeft = meanValue1/meanNum1-0.03; %%斜率边界    
+    slValueRight = meanValue2/meanNum2+0.03;    
     
 else
     meanValue = 0;
@@ -93,8 +104,8 @@ else
             meanValue = meanValue + slope2(i,1);
         end
     end
-    slValueLeft = meanValue/meanNum-0.05; %%斜率边界
-    slValueRight = meanValue/meanNum+0.05; 
+    slValueLeft = meanValue/meanNum-0.03; %%斜率边界
+    slValueRight = meanValue/meanNum+0.03; 
 end
 
 
@@ -121,32 +132,32 @@ for m = 1:dirlistT_lens
     end
 end
 
-imgSlope = zeros(M+2*Msize,N+2*Msize);
-for m = 1:dirlistT_lens
-    if slopeX(m,1) == 1
-        aa = dirlist_lineT{m};
-        aaMax = max(aa(:,1));
-        aaMin = min(aa(:,1));
-        for n = aaMin:aaMax
-            xx = n;
-            yy = round(n*tan(slope(m,1))+slope(m,2));
-            if yy < N+2*Msize & yy >= 1
-                imgSlope(xx,yy) = 255;
-            end
-        end
-    elseif slopeX(m,1) == 2 
-        aa = dirlist_lineT{m};        
-        aaMax = max(aa(:,2));
-        aaMin = min(aa(:,2));
-        for n = aaMin:aaMax
-            yy = n;
-            xx = round((yy-slope(m,2))/tan(slope(m,1)));
-            if xx < M+2*Msize & xx >= 1
-                imgSlope(xx,yy) = 255;
-            end
-        end 
-    end
-end
+% imgSlope = zeros(M+2*Msize,N+2*Msize);
+% for m = 1:dirlistT_lens
+%     if slopeX(m,1) == 1
+%         aa = dirlist_lineT{m};
+%         aaMax = max(aa(:,1));
+%         aaMin = min(aa(:,1));
+%         for n = aaMin:aaMax
+%             xx = n;
+%             yy = round(n*tan(slope(m,1))+slope(m,2));
+%             if yy < N+2*Msize & yy >= 1
+%                 imgSlope(xx,yy) = 255;
+%             end
+%         end
+%     elseif slopeX(m,1) == 2 
+%         aa = dirlist_lineT{m};        
+%         aaMax = max(aa(:,2));
+%         aaMin = min(aa(:,2));
+%         for n = aaMin:aaMax
+%             yy = n;
+%             xx = round((yy-slope(m,2))/tan(slope(m,1)));
+%             if xx < M+2*Msize & xx >= 1
+%                 imgSlope(xx,yy) = 255;
+%             end
+%         end 
+%     end
+% end
 % figure('Name','斜率约束'),imshow(imgSlope);
 % %% 延长线
 % imgSlope = zeros(M+2*Msize,N+2*Msize);

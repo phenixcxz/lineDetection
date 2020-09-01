@@ -37,9 +37,10 @@ for m=1:dirlistT_lens
 %             if img(x,y+2) - img(x,y+3) > gap || img(x,y+3) - img(x,y+4) > gap %右边缘
 %                 grads1(m,1) = grads1(m,1)+1;
 %             end
-            if img(x,y+1)-img(x,y+2)>gap
-                grads1(m,4) = grads1(m,4)+1;
-            elseif img(x,y+2)-img(x,y+3)>gap
+%             if img(x,y+1)-img(x,y+2)>gap
+%                 grads1(m,4) = grads1(m,4)+1;
+%             elseif img(x,y+2)-img(x,y+3)>gap
+            if img(x,y+2)-img(x,y+3)>gap
                 grads1(m,5) = grads1(m,5)+1;
             elseif img(x,y+3)-img(x,y+4) > gap
                 grads1(m,6) = grads1(m,6)+1;
@@ -53,9 +54,11 @@ for m=1:dirlistT_lens
 %             if img(x,y-2) - img(x,y-3) > gap || img(x,y-3) - img(x,y-4) > gap %左边缘
 %                 grads1(m,2) = grads1(m,2)+1;
 %             end 
-            if img(x,y-1)-img(x,y-2)>gap
-                grads1(m,8) = grads1(m,8)+1;
-            elseif img(x,y-2)-img(x,y-3)>gap
+%             if img(x,y-1)-img(x,y-2)>gap
+%                 grads1(m,8) = grads1(m,8)+1;
+
+%             elseif img(x,y-2)-img(x,y-3)>gap
+            if img(x,y-2)-img(x,y-3)>gap
                 grads1(m,9) = grads1(m,9)+1;
             elseif img(x,y-3)-img(x,y-4) > gap
                 grads1(m,10) = grads1(m,10)+1;

@@ -2,16 +2,24 @@ clear all
 close all
 
 warning off
-im=imread('DSC00042.jpg');
+
+name = './data/DSC00120';
+nameJpg = [name,'.jpg'];
+nameJson = [name,'.json'];
+im=imread(nameJpg);
+% im = im(481:4320,721:6480,:);
 lineT=30;
+M = 480;
+N = 720;
+% [M,N]=size(Img);
 %%旋转图像
 % im = imrotate(im,45);
 % im = imresize(im,[640,480]);
 
-im = imresize(im,[480,640]);
+im = imresize(im,[M,N]);
 % figure('Name','缩略图'),imshow(im);
 
-%% 灰度化图像
+% 灰度化图像
 % imHsv=rgb2hsv(im);
 % imwrite(imHsv,'1imHsv.jpg');
 % 
@@ -24,7 +32,7 @@ figure('Name','灰度图'), imshow(Img);
 
 % Img = imadjust(Img);      %增强对比度
 % figure('Name','灰度图2'), imshow(Img);
-[M,N]=size(Img);
+
 
 % for m = 3:M-2
 %     for n = 3:N-2
@@ -57,7 +65,7 @@ Cimg=uint8(Cimg);
 
 imgn = zeros(M+2*Msize,N+2*Msize); 
 
-% figure('Name','Cimg'),imshow(Cimg);
+figure('Name','Cimg'),imshow(Cimg);
 
 
 %% 连续点数限制
@@ -280,11 +288,15 @@ while(m <=Lnum)
     devote11(num,2) = devoteFun2(m,2);
     devote11(num,3) = devoteFun2(m,3);
     devote11(num,4) = devoteFun2(m,4);
-    ind = find(devote11(num,2)<devoteFun2(:,1));
+    ind = find(devote11(num,2)<=devoteFun2(:,1));
     if isempty(ind)     %合并最后一条线
         for n = m+1:Lnum
            devote11(num,3) = devote11(num,3)+devoteFun2(n,3);
         end
+%         for n = m+1:Lnum
+%             devote11(n,:) =[];
+%         end
+        
         break;
     end
     for n = m+1:ind(1)-1    %统计票数
@@ -293,11 +305,12 @@ while(m <=Lnum)
     m = ind(1);
 end
 
+devote11(all(devote11(:,3)<240,2),:)=[];
 
 %% 画出拟合直线
 imgResult10 = uint8(img) ;
-for m = 1:Lnum
-    if devote11(m,3)>100
+for m = 1:length(devote11)
+    if devote11(m,3)>240
         for n = devote11(m,1):devote11(m,2)
             b = n-tan(devote11(m,4))*(M/2+Msize);
             for xx = Msize:Msize+M
@@ -311,3 +324,73 @@ for m = 1:Lnum
 end
         
 figure('Name','直线拟合3'),imshow(uint8(imgResult10));
+
+
+addpath('./jsonlab-1.5');
+data=loadjson(nameJson);
+multiple = 1920/480;
+shapes = data.shapes;
+sLength = length(shapes);
+points = {6};
+for i = 1:6
+    temp = shapes(i);
+    points{i} = temp{1,1}.points;
+end
+
+result = zeros(6,4);
+for i = 1:6
+   temp = points{i};
+   p1 = polyfit(temp(1:2,2),temp(1:2,1),1);
+   p2 = polyfit(temp(3:4,2),temp(3:4,1),1);
+   
+   slope1 = atan(p1(1));
+   slope2 = atan(p2(1));
+   startdot1 = round(p1(2)/multiple)+2;
+   startdot2 = round(p2(2)/multiple)+2;
+    if slope1 < 0
+        slope1 = pi+slope1;
+    end
+    if slope2 < 0
+        slope2 = pi+slope2;
+    end
+    slope = (slope1+slope2)/2;
+
+    result(i,1) = startdot1;
+    result(i,2) =startdot2;
+%     result(i,3) = 
+    result(i,4) = slope;
+end
+
+
+for m = 1:sLength
+    slope = result(m,:);
+    for n = slope(1,1):slope(1,2)
+        for xx = Msize+1:Msize+M
+            yy = round(xx*tan(slope(1,4))+n+Msize);
+            if yy >=1 && yy < N+Msize
+                img(xx,yy) = 255;
+            end
+        end
+    end
+end
+
+figure('Name','数据标注'),imshow(uint8(img));
+
+% 1.面积重合率，2，斜率偏差率
+precision = zeros(6,6);
+
+for m = 1:sLength
+    %弧度偏差小于0.02认为拟合
+    if abs(result(m,4)-devote11(m,4))<0.02
+        precision(m,2) = 1;
+    end
+    %位置偏差
+    if devote11(m,1)+1 >= result(m,1)-2 & devote11(m,2)-1 <= result(m,2)+2
+        precision(m,1) = 1;
+    end
+    
+end
+
+
+
+
