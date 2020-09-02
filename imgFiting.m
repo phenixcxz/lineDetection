@@ -3,12 +3,12 @@ close all
 
 warning off
 
-name = './data/DSC00156';
+name = './data/DSC00042';
 nameJpg = [name,'.jpg'];
 nameJson = [name,'.json'];
 im=imread(nameJpg);
 % im = im(481:4320,721:6480,:);
-lineT=30;
+lineT=20;
 M = 480;
 N = 720;
 % [M,N]=size(Img);
@@ -66,7 +66,7 @@ Cimg=uint8(Cimg);
 toc
 % imgn = zeros(M+2*Msize,N+2*Msize); 
 
-% figure('Name','Cimg'),imshow(Cimg);
+figure('Name','Cimg'),imshow(Cimg);
 
 
 %% 连续点数限制
@@ -277,7 +277,8 @@ devote11(all(devote11(:,3)<240,2),:)=[];
 toc
 %% 画出拟合直线
 imgResult10 = uint8(img) ;
-for m = 1:length(devote11)
+[lengthde,~] = size(devote11);
+for m = 1:lengthde
     for n = devote11(m,1):devote11(m,2)
         b = n-tan(devote11(m,4))*(M/2+Msize);
         for xx = Msize:Msize+M

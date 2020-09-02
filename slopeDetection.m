@@ -25,7 +25,7 @@ slope2(:,3) = slope(pos,3);
 slope2(:,2) = slope(pos,2);
 slope2(:,1)= slope(pos,1);
 
-gap=0.03;
+gap=0.020;
 gaplen = ceil(pi/gap);
 
 slopeR = zeros(1,gaplen);

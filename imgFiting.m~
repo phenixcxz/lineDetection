@@ -3,7 +3,7 @@ close all
 
 warning off
 
-name = 'DSC00042';
+name = './data/DSC00071';
 nameJpg = [name,'.jpg'];
 nameJson = [name,'.json'];
 im=imread(nameJpg);
@@ -55,7 +55,7 @@ end
 Msize=fix(win/2);
 bw1=zeros(M+2*Msize,N+2*Msize);
 bw1(Msize+1:M+Msize,Msize+1:N+Msize)=bw;
-[edgelist,edgeim,codeimg,dirlist,labelim] = alinecoding(bw1,0.005);
+[edgelist,edgeim,codeimg,dirlist,labelim] = alinecoding(bw1,0.01);
 
 pplist={};
 ppnum=0;
@@ -63,9 +63,10 @@ ppnum=0;
 Cimg=codeimg(Msize+1:M+Msize,Msize+1:N+Msize);%编码图像
 Cimg=uint8(Cimg);
 
-imgn = zeros(M+2*Msize,N+2*Msize); 
+toc
+% imgn = zeros(M+2*Msize,N+2*Msize); 
 
-figure('Name','Cimg'),imshow(Cimg);
+% figure('Name','Cimg'),imshow(Cimg);
 
 
 %% 连续点数限制
@@ -105,6 +106,7 @@ for m = 1:length(dirlistT)
     end
 end
 dirlistT(cellfun(@isempty,dirlistT))=[];
+
 slope(all(slopeX(:,1)==0,2),:)=[];
 slopeT = slope;
 [~,pos] = sort(slopeT(:,3));
@@ -271,10 +273,11 @@ for m = 1:xy
     devote11(m,3) = sum(devoteFun2(l,3));    
 end
 %% 去除不符合要求线
-devote11(all(devote11(:,3)<240,2),:)=[];
+devote11(all(devote11(:,3)<360,2),:)=[];
 toc
 %% 画出拟合直线
 imgResult10 = uint8(img) ;
+lengthde = 
 for m = 1:length(devote11)
     for n = devote11(m,1):devote11(m,2)
         b = n-tan(devote11(m,4))*(M/2+Msize);
