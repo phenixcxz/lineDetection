@@ -3,7 +3,7 @@ close all
 
 warning off
 
-name = './data/DSC00421';
+name = './data/DSC00100';
 
 nameJpg = [name,'.jpg'];
 nameJson = [name,'.json'];
@@ -80,17 +80,17 @@ dirlistT(cellfun(@isempty,dirlistT))=[];
 
 
 %% 获取颜色梯度信息,并滤波
-[dirlistT,gradsX,gradsY] = gradsDetection(dirlistT,img,M,N,Msize);
+[dirlistG1,gradsX,gradsY] = gradsDetection(dirlistT,img,M,N,Msize);
 %% 获取斜率信息，并滤波
-[dirlistT,slope,flag] = slopeDetection(dirlistT,img,M,N,Msize);
+[dirlistS1,slope,flag] = slopeDetection(dirlistG1,img,M,N,Msize);
 % 直线连接
-[Llist,Lnum,slopeT]=lineConnection(dirlistT,slope,img,M,N,Msize,lineT,flag);
+[Llist,Lnum,slopeT]=lineConnection(dirlistS1,slope,img,M,N,Msize,lineT,flag);
 % 
 % %获取颜色梯度
-[~,grads]=gradsDetection(Llist,img,M,N,Msize);
+[LlistG,grads]=gradsDetection(Llist,img,M,N,Msize);
 
 % 拟合直线
-[result] = fitLine(Llist,grads,M,N,Msize,flag);
+[result] = fitLine(LlistG,grads,M,N,Msize,flag);
 % [result] = fitLine(dirlistT,gradsY,M,N,Msize,flag);
 toc %计时信息
 

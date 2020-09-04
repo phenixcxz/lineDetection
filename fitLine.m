@@ -80,4 +80,4 @@ for m = 1:xy
     result(m,3) = sum(devoteFun(l,3));    
 end
 %% 去除不符合要求线
-result(all(result(:,3)<240,2),:)=[];
+result(all(result(:,3)<300,2),:)=[];

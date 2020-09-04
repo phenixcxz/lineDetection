@@ -112,21 +112,21 @@ end
 dirlistT(cellfun(@isempty,dirlistT))=[];
 slope(all(slope(:,1)==10,2),:)=[];
 % 
-% imgSlope = zeros(M+2*Msize,N+2*Msize);
-% for m = 1:dirlistT_lens
+imgSlope = zeros(M+2*Msize,N+2*Msize);
+for m = 1:length(dirlistT)
 %     if slopeXY(m,1) == 1
-%         aa = dirlist_lineT{m};
-%         aaMax = max(aa(:,1));
-%         aaMin = min(aa(:,1));
-%         for n = aaMin:aaMax
-%             xx = n;
-%             yy = round(n*tan(slope(m,1))+slope(m,2));
-%             if yy < N+2*Msize & yy >= 1
-%                 imgSlope(xx,yy) = 255;
-%             end
-%         end
+        aa = dirlistT{m};
+        aaMax = max(aa(:,1));
+        aaMin = min(aa(:,1));
+        for n = aaMin:aaMax
+            xx = n;
+            yy = round(n*tan(slope(m,1))+slope(m,2));
+            if yy < N+2*Msize & yy >= 1
+                imgSlope(xx,yy) = 255;
+            end
+        end
 %     elseif slopeXY(m,1) == 2 
-%         aa = dirlist_lineT{m};        
+%         aa = dirlistT{m};        
 %         aaMax = max(aa(:,2));
 %         aaMin = min(aa(:,2));
 %         for n = aaMin:aaMax
@@ -137,8 +137,8 @@ slope(all(slope(:,1)==10,2),:)=[];
 %             end
 %         end 
 %     end
-% end
-% figure('Name','斜率约束'),imshow(imgSlope);
+end
+figure('Name','斜率约束'),imshow(imgSlope);
 
 
 end
