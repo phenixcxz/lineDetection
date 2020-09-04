@@ -29,8 +29,7 @@ gap = 5;
 
 for m=1:dirlistT_lens
     aa = dirlist_lineT{m};
-    num = length(aa);
-    for n = 1:size(aa)
+    for n = 1:length(aa)
         x=aa(n,1);
         y=aa(n,2);
         if img(x,y+1) - img(x,y) > gap   %左边缘

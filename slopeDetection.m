@@ -1,10 +1,11 @@
-function [slope,slValueLeft,slValueRight,slopeX,slopeY]=slopeDetection(dirlist_lineT,dirlistT_lens,img,M,N,Msize)
+function [dirlistT,slope,flag]=slopeDetection(dirlistT,img,M,N,Msize)
 %% 直线拟合+信息统计
 % imgdown = zeros(M+2*Msize,N+2*Msize);
 %斜率，起始点，连续点数，计算的起点，图像中点，
+dirlistT_lens = length(dirlistT);
 slope=zeros(dirlistT_lens,5);       %斜率计算
 for m=1:dirlistT_lens
-    aa=dirlist_lineT{m};  %待处理线段
+    aa=dirlistT{m};  %待处理线段
     x = length(aa);
     p = polyfit(aa(round(x*2/10):round(x*8/10),1),aa(round(x*2/10):round(x*8/10),2),1);     %线段斜率与起始点
     slope(m,1) = atan(p(1));
@@ -15,15 +16,14 @@ for m=1:dirlistT_lens
     slope(m,5) = round(p(1)*(M/2+Msize)+p(2));      %中点
     slope(m,3) = x;                 %连续点个数
     slope(m,4) = aa(1,1);
-    
 end
 
 %% 斜率排序
 slope2 = slope;
 [~,pos] = sort(slope(:,3));
-slope2(:,3) = slope(pos,3);
-slope2(:,2) = slope(pos,2);
-slope2(:,1)= slope(pos,1);
+slope2(:,:) = slope(pos,:);
+% slope2(:,2) = slope(pos,2);
+% slope2(:,1)= slope(pos,1);
 
 gap=0.020;
 gaplen = ceil(pi/gap);
@@ -41,48 +41,80 @@ slopeR2(1) = slopeR(1)+slopeR(2)+slopeR(gaplen);
 slopeR2(gaplen) = slopeR(1)+slopeR(gaplen-1)+slopeR(gaplen);
 
 [~,maxDot]=max(slopeR2(:));
-flag1 = 0;
+flag = 0;
 slValueLeft = 0;
 slValueRight = 0;
 if maxDot ==1 
     slValueLeft=pi-gap;
     slValueRight = gap*2;
-    flag1 = 1;
+    flag = 1;
 elseif maxDot == gaplen
-        flag1 = 1;
+        flag= 1;
     slValueLeft=pi-gap*2;
     slValueRight = gap;
 else
     slValueLeft = gap*(maxDot-2);
     slValueRight = gap*(maxDot+1);   
 end
-    
-%% 弧度约束
-slopeX = zeros(dirlistT_lens,1);
-pi1 = pi/4;
-pi2 = pi*3/4;
+
 for m = 1:dirlistT_lens
     aaSlope = slope(m,1);       
-    if flag1 == 1
-        if aaSlope > slValueLeft | aaSlope < slValueRight
-            slopeX(m,1) = 1;
+    if flag == 1
+        if aaSlope < slValueLeft && aaSlope < slValueRight
+            dirlistT{m} = {};
+            slope(m,1) = 10;
         end
     else
-        if aaSlope >pi1 & aaSlope < pi2
-            if aaSlope>=slValueLeft & aaSlope <= slValueRight
-                slopeX(m,1) = 2;
-            end
-        else
-            if aaSlope >= slValueLeft & aaSlope <= slValueRight
-                slopeX(m,1) = 1;
-            end
+        if aaSlope < slValueLeft || aaSlope > slValueRight
+            dirlistT{m} = {};
+            slope(m,1) = 10;
         end
+%         if aaSlope >pi1 || aaSlope < pi2
+%             if aaSlope>=slValueLeft & aaSlope <= slValueRight
+%                 slopeXY(m,1) = 2;
+%             end
+%         else
+%             if aaSlope >= slValueLeft & aaSlope <= slValueRight
+%                 slopeXY(m,1) = 1;
+%             end
+%         end
     end
 end
+%% 弧度约束
+% slopeXY = zeros(dirlistT_lens,1);
+% pi1 = pi/4;
+% pi2 = pi*3/4;
+% for m = 1:dirlistT_lens
+%     aaSlope = slope(m,1);       
+%     if flag == 1
+%         if aaSlope > slValueLeft | aaSlope < slValueRight
+%             slopeXY(m,1) = 1;
+%         end
+%     else
+%         if aaSlope >pi1 & aaSlope < pi2
+%             if aaSlope>=slValueLeft & aaSlope <= slValueRight
+%                 slopeXY(m,1) = 2;
+%             end
+%         else
+%             if aaSlope >= slValueLeft & aaSlope <= slValueRight
+%                 slopeXY(m,1) = 1;
+%             end
+%         end
+%     end
+% end
+
+% 去除梯度不符合要求的线
+% for m = 1:length(dirlistT)
+%     if slopeXY(m,1) == 0
+%         dirlistT{m} = {};
+%     end
+% end
+dirlistT(cellfun(@isempty,dirlistT))=[];
+slope(all(slope(:,1)==10,2),:)=[];
 % 
 % imgSlope = zeros(M+2*Msize,N+2*Msize);
 % for m = 1:dirlistT_lens
-%     if slopeX(m,1) == 1
+%     if slopeXY(m,1) == 1
 %         aa = dirlist_lineT{m};
 %         aaMax = max(aa(:,1));
 %         aaMin = min(aa(:,1));
@@ -93,7 +125,7 @@ end
 %                 imgSlope(xx,yy) = 255;
 %             end
 %         end
-%     elseif slopeX(m,1) == 2 
+%     elseif slopeXY(m,1) == 2 
 %         aa = dirlist_lineT{m};        
 %         aaMax = max(aa(:,2));
 %         aaMin = min(aa(:,2));
