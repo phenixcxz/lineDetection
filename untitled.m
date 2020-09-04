@@ -1,1 +1,0 @@
-groundTruthLabeler('caltech_cordova1.avi')
