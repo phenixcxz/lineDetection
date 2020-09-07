@@ -1,5 +1,6 @@
 
 function [result] = fitLine(Llist,grads,M,N,Msize,flag)
+% result [左中点，右中点，票数，斜率]
 Lnum = length(Llist);
 slope=zeros(Lnum,5);       %斜率计算
 for m=1:Lnum
@@ -80,4 +81,4 @@ for m = 1:xy
     result(m,3) = sum(devoteFun(l,3));    
 end
 %% 去除不符合要求线
-result(all(result(:,3)<300,2),:)=[];
+result(all(result(:,3)<240,2),:)=[];

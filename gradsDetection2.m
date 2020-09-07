@@ -81,28 +81,28 @@ for m=1:dirlistT_lens
     end
 end
 
-% % 去除颜色梯度不符合要求的线
+% 去除颜色梯度不符合要求的线
 % for m = 1:length(dirlistT)
 %     if gradsX(m,3)< 1 && gradsY(m,3)<1
 %         dirlistT{m} = {};
 %     end
 % end
 % dirlistT(cellfun(@isempty,dirlistT))=[];
-
-%% 梯度约束图形化显示
+% gradsX(all(gradsX(:,3)==0,2),:)=[];
+% 梯度约束图形化显示
 % 横向梯度约束 
 % imggradsX = zeros(M+2*Msize,N+2*Msize);
 % for m = 1:length(dirlistT)
 %     aa = dirlistT{m};
 % %     [x,y] = size(aa);
-%     if gradsX(m,3)>0
+% %     if gradsX(m,3)>0
 %         for n = 1:size(aa)
 %             imggradsX(aa(n,1),aa(n,2)) = 255;
 %         end
-%     end
+% %     end
 % end
 % figure('Name','横向梯度约束'),imshow(imggradsX);
-% % 
+% 
 % %% 纵向梯度约束 
 % imggradsY = zeros(M+2*Msize,N+2*Msize);
 % for m = 1:dirlistT_lens

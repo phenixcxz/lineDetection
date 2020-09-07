@@ -58,8 +58,8 @@ for m = 1:length(dirlistT)
         end  
     end
 end
-% figure('Name','延长线'),imshow(uint8(imgResult2));
-
+figure('Name','延长线'),imshow(uint8(imgResult2));
+% imgResult3 = imgResult2(Msize+1:M+Msize,Msize+1:N+Msize);
 %% 二次提取边缘线
 [L,Lnum] = bwlabel(imgResult2,8);
 Llist = {Lnum};

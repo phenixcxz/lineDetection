@@ -18,14 +18,31 @@ for m=1:dirlistT_lens
     slope(m,4) = aa(1,1);
 end
 
+[Idx,C,sumD,D]=kmeans(slope(:,1),6);
+
+test =zeros(1,7);
+for m = 1:dirlistT_lens
+    test(Idx(m)) = test(Idx(m))+1;
+end
+
+slope2 = slope;
+[~,maxText] = max(test);
+slope2(all(Idx(:,1)~=maxText,2),:)=[];
+for m = 1:dirlistT_lens
+    
+    dirlistT{m} = {};
+% for m = 1:dirlistT_lens
+
+dirlistT(cellfun(@isempty,dirlistT))=[];
+% slope(all(slope(:,1)==10,2),:)=[];
+
+
 %% 斜率排序
 slope2 = slope;
-[~,pos] = sort(slope(:,3));
-slope2(:,:) = slope(pos,:);
-% slope2(:,2) = slope(pos,2);
-% slope2(:,1)= slope(pos,1);
+[~,pos] = sort(slope2(:,3));
+slope2(:,:) = slope2(pos,:);
 
-gap=0.020;
+gap=0.015;
 gaplen = ceil(pi/gap);
 
 slopeR = zeros(1,gaplen);
@@ -60,33 +77,16 @@ end
 for m = 1:dirlistT_lens
     aaSlope = slope(m,1);       
     if flag == 1
-        if aaSlope < slValueLeft && aaSlope < slValueRight
+        if aaSlope < slValueLeft && aaSlope > slValueRight
             dirlistT{m} = {};
+            slope(m,1) = 10;
         end
     else
-        if aaSlope >pi1 & aaSlope < pi2
-            if aaSlope>=slValueLeft & aaSlope <= slValueRight
-                slopeXY(m,1) = 2;
-            end
-        else
-            if aaSlope >= slValueLeft & aaSlope <= slValueRight
-                slopeXY(m,1) = 1;
-            end
+        if aaSlope < slValueLeft || aaSlope > slValueRight
+            dirlistT{m} = {};
+            slope(m,1) = 10;
         end
-    end
-end
-%% 弧度约束
-% slopeXY = zeros(dirlistT_lens,1);
-% pi1 = pi/4;
-% pi2 = pi*3/4;
-% for m = 1:dirlistT_lens
-%     aaSlope = slope(m,1);       
-%     if flag == 1
-%         if aaSlope > slValueLeft | aaSlope < slValueRight
-%             slopeXY(m,1) = 1;
-%         end
-%     else
-%         if aaSlope >pi1 & aaSlope < pi2
+%         if aaSlope >pi1 || aaSlope < pi2
 %             if aaSlope>=slValueLeft & aaSlope <= slValueRight
 %                 slopeXY(m,1) = 2;
 %             end
@@ -95,22 +95,28 @@ end
 %                 slopeXY(m,1) = 1;
 %             end
 %         end
-%     end
-% end
-
-% 去除梯度不符合要求的线
-% for m = 1:length(dirlistT)
-%     if slopeXY(m,1) == 0
-%         dirlistT{m} = {};
-%     end
-% end
+    end
+end
 dirlistT(cellfun(@isempty,dirlistT))=[];
-slope(all(slopeXY(:,1)==0,2),:)=[];
+slope(all(slope(:,1)==10,2),:)=[];
+
+imggrads= zeros(M+2*Msize,N+2*Msize);
+for m = 1:length(dirlistT)
+    aa = dirlistT{m};
+%     [x,y] = size(aa);
+    for n=1:length(aa)
+        xx = aa(n,1);
+        yy = aa(n,2);
+        imggrads(xx,yy) = 255;
+    end
+end
+
+figure('Name','斜率约束'),imshow(imggrads);  
 % 
 % imgSlope = zeros(M+2*Msize,N+2*Msize);
-% for m = 1:dirlistT_lens
-%     if slopeXY(m,1) == 1
-%         aa = dirlist_lineT{m};
+% for m = 1:length(dirlistT)
+% %     if slopeXY(m,1) == 1
+%         aa = dirlistT{m};
 %         aaMax = max(aa(:,1));
 %         aaMin = min(aa(:,1));
 %         for n = aaMin:aaMax
@@ -120,18 +126,18 @@ slope(all(slopeXY(:,1)==0,2),:)=[];
 %                 imgSlope(xx,yy) = 255;
 %             end
 %         end
-%     elseif slopeXY(m,1) == 2 
-%         aa = dirlist_lineT{m};        
-%         aaMax = max(aa(:,2));
-%         aaMin = min(aa(:,2));
-%         for n = aaMin:aaMax
-%             yy = n;
-%             xx = round((yy-slope(m,2))/tan(slope(m,1)));
-%             if xx < M+2*Msize & xx >= 1
-%                 imgSlope(xx,yy) = 255;
-%             end
-%         end 
-%     end
+% %     elseif slopeXY(m,1) == 2 
+% %         aa = dirlistT{m};        
+% %         aaMax = max(aa(:,2));
+% %         aaMin = min(aa(:,2));
+% %         for n = aaMin:aaMax
+% %             yy = n;
+% %             xx = round((yy-slope(m,2))/tan(slope(m,1)));
+% %             if xx < M+2*Msize & xx >= 1
+% %                 imgSlope(xx,yy) = 255;
+% %             end
+% %         end 
+% %     end
 % end
 % figure('Name','斜率约束'),imshow(imgSlope);
 

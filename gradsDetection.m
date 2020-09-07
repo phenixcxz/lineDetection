@@ -41,45 +41,45 @@ for m=1:dirlistT_lens
     end
 end
 
-% %% 寻找纵向梯度
-% gradsY = zeros(dirlistT_lens,12);
-% gap = 10;
-% for m=1:dirlistT_lens
-%     aa = dirlistT{m};
-%     for n = 1:size(aa)
-%         x=aa(n,1);
-%         y=aa(n,2);
-%         if img(x+1,y) - img(x,y) > gap   %上边缘
-%             gradsY(m,1) = gradsY(m,1)+1;
-% %             if img(x,y+1)-img(x,y+2)>gap
-% %                 gradsX(m,4) = gradsX(m,4)+1;y
-%             if img(x+2,y)-img(x+3,y)>gap
-%                 gradsY(m,5) = gradsY(m,5)+1;
-%             elseif img(x+3,y)-img(x+4,y) > gap
-%                 gradsY(m,6) = gradsY(m,6)+1;
-%             elseif img(x+4,y)-img(x+5,y) > gap
-%                 gradsY(m,7) = gradsY(m,7)+1;
-%             end  
-%         end
-%         if img(x-1,y) - img(x,y) > gap   %下边缘
-%             gradsY(m,2) = gradsY(m,2)+1;
-% %             if img(x,y-1)-img(x,y-2)>gap
-% %                 gradsX(m,8) = gradsX(m,8)+1;
-%             if img(x-2,y)-img(x-3,y)>gap
-%                 gradsY(m,5) = gradsY(m,5)+1;
-%             elseif img(x-3,y)-img(x-4,y) > gap
-%                 gradsY(m,6) = gradsY(m,6)+1;
-%             elseif img(x-4,y)-img(x-5,y)>gap
-%                 gradsY(m,7) = gradsY(m,7)+1;
-%             end
-%         end
-%     end
-%     if gradsY(m,1)/length(aa)>3/5 
-%         gradsY(m,3) = 1;
-%     elseif gradsY(m,2)/length(aa)> 3/5
-%         gradsY(m,3) = 2;
-%     end
-% end
+%% 寻找纵向梯度
+gradsY = zeros(dirlistT_lens,12);
+gap = 5;
+for m=1:dirlistT_lens
+    aa = dirlistT{m};
+    for n = 1:size(aa)
+        x=aa(n,1);
+        y=aa(n,2);
+        if img(x+1,y) - img(x,y) > gap   %上边缘
+            gradsY(m,1) = gradsY(m,1)+1;
+%             if img(x,y+1)-img(x,y+2)>gap
+%                 gradsX(m,4) = gradsX(m,4)+1;y
+            if img(x+2,y)-img(x+3,y)>gap
+                gradsY(m,5) = gradsY(m,5)+1;
+            elseif img(x+3,y)-img(x+4,y) > gap
+                gradsY(m,6) = gradsY(m,6)+1;
+            elseif img(x+4,y)-img(x+5,y) > gap
+                gradsY(m,7) = gradsY(m,7)+1;
+            end  
+        end
+        if img(x-1,y) - img(x,y) > gap   %下边缘
+            gradsY(m,2) = gradsY(m,2)+1;
+%             if img(x,y-1)-img(x,y-2)>gap
+%                 gradsX(m,8) = gradsX(m,8)+1;
+            if img(x-2,y)-img(x-3,y)>gap
+                gradsY(m,5) = gradsY(m,5)+1;
+            elseif img(x-3,y)-img(x-4,y) > gap
+                gradsY(m,6) = gradsY(m,6)+1;
+            elseif img(x-4,y)-img(x-5,y)>gap
+                gradsY(m,7) = gradsY(m,7)+1;
+            end
+        end
+    end
+    if gradsY(m,1)/length(aa)>3/5 
+        gradsY(m,3) = 1;
+    elseif gradsY(m,2)/length(aa)> 3/5
+        gradsY(m,3) = 2;
+    end
+end
 
 % 去除颜色梯度不符合要求的线
 for m = 1:length(dirlistT)
@@ -88,8 +88,21 @@ for m = 1:length(dirlistT)
     end
 end
 dirlistT(cellfun(@isempty,dirlistT))=[];
+gradsX(all(gradsX(:,3)==0,2),:)=[];
+imggrads= zeros(M+2*Msize,N+2*Msize);
+for m = 1:length(dirlistT)
+    aa = dirlistT{m};
+%     [x,y] = size(aa);
+    for n=1:length(aa)
+        xx = aa(n,1);
+        yy = aa(n,2);
+        imggrads(xx,yy) = 255;
+    end
+end
 
-%% 梯度约束图形化显示
+figure('Name','梯度约束'),imshow(imggrads);        
+
+% 梯度约束图形化显示
 % 横向梯度约束 
 % imggradsX = zeros(M+2*Msize,N+2*Msize);
 % for m = 1:length(dirlistT)
