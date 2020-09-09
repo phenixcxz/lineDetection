@@ -133,18 +133,18 @@ end
 dirlistT(cellfun(@isempty,dirlistT))=[];
 slope(all(slope(:,1)==10,2),:)=[];
 
-imggrads= zeros(M+2*Msize,N+2*Msize);
-for m = 1:length(dirlistT)
-    aa = dirlistT{m};
-%     [x,y] = size(aa);
-    for n=1:length(aa)
-        xx = aa(n,1);
-        yy = aa(n,2);
-        imggrads(xx,yy) = 255;
-    end
-end
-% flag = 0;
-figure('Name','斜率约束'),imshow(imggrads);  
+% imggrads= zeros(M+2*Msize,N+2*Msize);
+% for m = 1:length(dirlistT)
+%     aa = dirlistT{m};
+% %     [x,y] = size(aa);
+%     for n=1:length(aa)
+%         xx = aa(n,1);
+%         yy = aa(n,2);
+%         imggrads(xx,yy) = 255;
+%     end
+% end
+% % flag = 0;
+% figure('Name','斜率约束'),imshow(imggrads);  
 % 
 % imgSlope = zeros(M+2*Msize,N+2*Msize);
 % for m = 1:length(dirlistT)

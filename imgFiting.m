@@ -1,54 +1,48 @@
 clear all
 close all
-
 warning off
-% 
-name = './data/DSC00118';
 
-nameJpg = [name,'.jpg'];
-nameJson = [name,'.json'];
 
-tic
-im=imread(nameJpg);
-% im = im(481:480*3,721:721*3,:);
+name = 'test18.png';
 
-lineT=20;
+im=imread(name);
+lineT=10;
 M = 480;
 N = 720;
 win=31;
 Msize=fix(win/2);
 
 % function [result2]=imgFiting(nameJpg,lineT,M,N,Msize)
+% im=imread(nameJpg);
 
-
-% im = im(481:4320,721:6480,:);
 
 %% 旋转图像
-% M = 720;
-% N = 480;
+% M = 480;
+% N = 720;
 % im = imrotate(im,90);
 
 im = imresize(im,[M,N]);
 
 %% 开始计时
-tic
-figure('Name','缩略图'),imshow(im);
+% tic
+% figure('Name','缩略图'),imshow(im);
 
 % 灰度化图像
-Im=rgb2hsv(im);
-Img3=rgb2gray(Im);
-figure('Name','灰度图Hsv'), imshow(Img3);
+% Im=rgb2hsv(im);
+% Img3=rgb2gray(Im);
+% figure('Name','灰度图Hsv'), imshow(Img3);
 
 
 % Img2=rgb2gray(im);
 % figure('Name','灰度图'), imshow(Img2);
 % figure('Name','灰度图'), imshow(Img);
-
+%  figure(1),imhist(Img2);
 % imwrite(Img,'1grayImg.jpg');
 
 Img=im(:,:,3);
-figure('Name','蓝原色'), imshow(Img);
+% figure('Name','蓝原色'), imshow(Img);
 
+% figure(2),imhist(Img);
 
 % Img = imadjust(Img);      %增强对比度
 % figure('Name','灰度图2'), imshow(Img);
@@ -61,15 +55,55 @@ figure('Name','蓝原色'), imshow(Img);
 % end
 % figure('Name','LTP'), imshow(Img);
 %% canny算法
-bw = edge(Img,'canny');
+bw = edge(Img,'canny',0.25);
+
 figure('Name','边缘检测'),imshow(bw);
 
-%% alinecoding算法
+% 
+% [L,Lnum] = bwlabel(bw,8);
+% Llist = {Lnum};
+% for i = 1:Lnum
+%     [r,c]=find(L==i);
+%     Llist{i} = [r,c];
+% end
 
+% imggradsX = zeros(M,N);
+% for m = 1:length(Llist)
+%     aa = Llist{m};
+%     if length(aa) > 30
+%         for n = 1:size(aa)
+%             imggradsX(aa(n,1),aa(n,2)) = 255;
+%         end
+%     else
+%         continue;
+%     end
+% %     end
+% end
+% figure('Name','横向梯度约束'),imshow(imggradsX);
+
+
+
+%% alinecoding算法
+% tic
 bw1=zeros(M+2*Msize,N+2*Msize);
 bw1(Msize+1:M+Msize,Msize+1:N+Msize)=bw;
-[edgelist,edgeim,codeimg,dirlist,labelim] = alinecoding(bw1,0.01);
-toc
+[edgelist,edgeim,codeimg,dirlist,labelim] = alinecoding(bw1,lineT);
+% toc
+
+% imggrads= zeros(M+2*Msize,N+2*Msize);
+% for m = 1:length(dirlist)
+%     aa = dirlist{m};
+% %     [x,y] = size(aa);
+%     for n=1:length(aa)
+%         xx = aa(n,1);
+%         yy = aa(n,2);
+%         imggrads(xx,yy) = 255;
+%     end
+% end
+
+% figure('Name','梯度约束'),imshow(imggrads);  
+
+% figure('Name','Cimg'),imshow(codeimg);
 
 %% 灰度图扩充边界
 img = zeros(M+2*Msize,N+2*Msize); 
@@ -79,18 +113,18 @@ for i = 1:M
     end
 end
 
-%% 连续点数限制
-dirlistT = dirlist;
-for i=1:length(dirlistT)
-    if length(dirlistT{i})<lineT
-        dirlistT{i} = [];
-    end
-end
-dirlistT(cellfun(@isempty,dirlistT))=[];
+% %% 连续点数限制
+% dirlistT = dirlist;
+% for i=1:length(dirlistT)
+%     if length(dirlistT{i})<lineT
+%         dirlistT{i} = [];
+%     end
+% end
+% dirlistT(cellfun(@isempty,dirlistT))=[];
 
 
 %% 获取颜色梯度信息,并滤波
-[dirlistG1,gradsX,gradsY] = gradsDetection(dirlistT,img,M,N,Msize);
+[dirlistG1,gradsX,gradsY] = gradsDetection(dirlist,img,M,N,Msize);
 %% 获取斜率信息，并滤波
 [dirlistS1,slope,flag] = slopeDetection(dirlistG1,img,M,N,Msize);
 % 直线连接
@@ -101,14 +135,14 @@ dirlistT(cellfun(@isempty,dirlistT))=[];
 
 % 拟合直线
 [result] = fitLine(LlistG,grads,M,N,Msize,flag);
-
+% toc
 result2 = zeros(length(result),3);
 for m = 1:length(result)
     result2(m,1) = result(m,1)-Msize-1;
     result2(m,2) = result(m,2)-result(m,1);
     result2(m,3) = result(m,4);
 end
-toc
+
 %% 画出拟合直线
 imgResult = Img;
 for m = 1:length(result2)

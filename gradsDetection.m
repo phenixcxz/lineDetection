@@ -89,18 +89,18 @@ for m = 1:length(dirlistT)
 end
 dirlistT(cellfun(@isempty,dirlistT))=[];
 gradsX(all(gradsX(:,3)==0,2),:)=[];
-imggrads= zeros(M+2*Msize,N+2*Msize);
-for m = 1:length(dirlistT)
-    aa = dirlistT{m};
-%     [x,y] = size(aa);
-    for n=1:length(aa)
-        xx = aa(n,1);
-        yy = aa(n,2);
-        imggrads(xx,yy) = 255;
-    end
-end
-
-figure('Name','梯度约束'),imshow(imggrads);        
+% imggrads= zeros(M+2*Msize,N+2*Msize);
+% for m = 1:length(dirlistT)
+%     aa = dirlistT{m};
+% %     [x,y] = size(aa);
+%     for n=1:length(aa)
+%         xx = aa(n,1);
+%         yy = aa(n,2);
+%         imggrads(xx,yy) = 255;
+%     end
+% end
+% 
+% figure('Name','梯度约束'),imshow(imggrads);        
 
 % 梯度约束图形化显示
 % 横向梯度约束 

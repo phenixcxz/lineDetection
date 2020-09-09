@@ -1,6 +1,6 @@
 %im：输入边缘图像     minlength：输入最小长度
 %通过寻找边缘中的三叉交点和端点跟踪边缘，并将每一个连续的边缘存入edgelist中，edgeim存入边缘标号图像
-function [edgelist,edgeim,codeimg,dirlist,labelim] = alinecoding(im,minlength,location)
+function [edgelist,edgeim,codeimg,dirlist,labelim] = alinecoding(im,minlength,~)
     
     global EDGEIM;      % Some global variables to avoid passing (and
                         % copying) of arguments, this improves speed.
@@ -37,17 +37,18 @@ function [edgelist,edgeim,codeimg,dirlist,labelim] = alinecoding(im,minlength,lo
              %    lim((edgepoints(:,2)-1)*ROWS+edgepoints(:,1))=1;
             %     figure
                %  imshow(lim);
-                if ~isempty(edgepoints)
+%                 if ~isempty(edgepoints)
+                if length(edgepoints)>6
                     edgeNo = edgeNo + 1;                    
                     edgelist{edgeNo} = edgepoints;
                     % DWL增加
-                    [ss,dir]=edgecoding(edgepoints,4); 
+                    [ss,dir]=edgecoding(edgepoints,6); 
                     if sum(dir)>0
-                       codeimg((edgepoints(:,2)-1)*ROWS+edgepoints(:,1))=dir;
+%                        codeimg((edgepoints(:,2)-1)*ROWS+edgepoints(:,1))=dir;
                        [LL,numL]=bwlabel(dir>0,4);
                        for j=1:numL
                            bb=edgepoints(LL==j,:);
-                           if length(bb)> 4
+                           if length(bb)> minlength
                               No=No+1;
                               dirlist{No}=bb;
                               labelim((bb(:,2)-1)*ROWS+bb(:,1))=No;

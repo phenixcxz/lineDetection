@@ -2,7 +2,7 @@ clear all
 close all
 % function [result]=imgFiting(nameJpg)
 warning off
-lineT=20;
+lineT=30;
 M = 480;
 N = 720;
 win=31;
@@ -10,19 +10,30 @@ Msize=fix(win/2);
  
 
 addpath('./jsonlab-1.5');
-resultSave = {20};
-for i = 11:20
+resultSave = {100};
+for i = 41:60
     mstr = num2str(i);
-    nameJpg= ['./data/DSC000',mstr,'.jpg'];
-    nameJson = ['./data/DSC000',mstr,'.json'];
+    nameJpg= ['./test/',mstr,'.jpg'];
+    nameJson = ['./test/',mstr,'.json'];
     tic
     result2 = imgFiting(nameJpg,lineT,M,N,Msize);
     toc
     testResult = resultTest(result2,nameJson,M,N,Msize);
-    resultSave{i-10} = testResult;
-%     result2{i-99}=testResult;  
-  
+    resultSave{i} = testResult;
+    
+    
 end
+
+temp1 = 0;
+temp2 = 0;
+for i = 1:20
+    result = resultSave{i};
+    temp1 = temp1+result(1);
+    temp2 = temp2+result(2);
+end
+aveResult1 = temp1/20;
+aveResult2 = temp2/20;
+    
 
 
 function [testResult] = resultTest(result2,nameJson,M,N,Msize)
@@ -57,7 +68,7 @@ imGray = zeros(M,N);
 TP = 0;
 FP = 0;
 FN = 0;
-N = 2*480+4*6*480;
+N = 1*480+4*6*480;
 for m = 1:sLength
     line = points{m};
     lineL = length(line);
@@ -65,11 +76,10 @@ for m = 1:sLength
         p= polyfit(line(n:n+1,2),line(n:n+1,1),1);
         k = p(1);
         b = round(p(2)/multiple);
-
         if pointsFlag(m) == 2
             for xx = round(line(n,2)/multiple)+1:round(line(n+1,2)/multiple)
                 yy =round(k*xx+b);
-                if yy >2 && yy <= N-2
+                if yy >2 && yy <= N-2 && xx >0 && xx <= M
                     imGray(xx,yy-2) = 255;
                     imGray(xx,yy-1) = 255;
                     imGray(xx,yy) = 255;
@@ -80,7 +90,7 @@ for m = 1:sLength
         else
             for xx = round(line(n,2)/multiple):round(line(n+1,2)/multiple)
                 yy =round(k*xx+b);
-                if yy >1 && yy <= N
+                if yy >1 && yy <= N-2 && xx >0 && xx <= M 
                     imGray(xx,yy-1) = 255;
                     imGray(xx,yy) = 255;
                 end
@@ -106,7 +116,7 @@ for m = 1:length(result2)
 end 
 FN = N-TP;
 testResult(1) = TP/(TP+FP);
-testResult(2) = TP/(FN+TP);
+testResult(2) = TP/(N+FP);
 % figure(1),imshow(imGray);
 
 
